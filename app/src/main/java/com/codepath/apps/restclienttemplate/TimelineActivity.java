@@ -3,6 +3,7 @@ package com.codepath.apps.restclienttemplate;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,7 @@ public class TimelineActivity extends AppCompatActivity {
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
+    SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,19 @@ public class TimelineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timeline);
 
         client = TwitterApp.getRestClient(this);
+
+        swipeContainer = findViewById(R.id.swipeContainer);
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.i(TAG, "fetching new data!");
+                populateHomeTimeline();
+            }
+        });
 
         // Find the recycler view
         rvTweets = findViewById(R.id.rvTweets);
@@ -55,8 +70,12 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i(TAG, "onSuccess!" + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
-                    tweets.addAll(Tweet.fromJsonArray(jsonArray));
-                    adapter.notifyDataSetChanged();
+                    // CLEAR OUT old items before appending in the new ones
+                    adapter.clear();
+                    // ...the data has come back, add new items to your adapter...
+                    adapter.addAll(Tweet.fromJsonArray(jsonArray));
+                    // Now we call setRefreshing(false) to signal refresh has finished
+                    swipeContainer.setRefreshing(false);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.e(TAG, "Json exception", e);
