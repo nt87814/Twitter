@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_height="match_parent"
+    tools:context=".TweetDetailActivity">
 
     <ImageView
         android:id="@+id/ivProfileImage"
@@ -12,8 +12,8 @@
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="20dp"
         android:layout_toEndOf="@+id/ivProfileImage"
         tools:text="Pandey1234" />
 
@@ -30,31 +30,24 @@
         android:id="@+id/tvBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvScreenName"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="2dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
-        tools:text="This is my tweet!!!" />
-
-    <TextView
-        android:id="@+id/tvTimestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/ivProfileImage"
+        android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="0dp"
-        tools:text="8m" />
+        tools:text="This is my tweet!!!" />
 
     <ImageView
         android:id="@+id/ivMedia1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvBody"
+        android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="225dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageButton
@@ -63,8 +56,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivMedia1"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="80dp"
+        android:layout_marginBottom="338dp"
         app:srcCompat="@drawable/ic_baseline_favorite_border_24" />
 
     <ImageButton
@@ -72,8 +67,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ivMedia1"
-        android:layout_marginTop="5dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="206dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="30dp"
+        android:layout_marginBottom="338dp"
         android:layout_toStartOf="@+id/btnFavorite"
         app:srcCompat="@drawable/ic_baseline_repeat_24" />
 

@@ -1,12 +1,19 @@
 package com.codepath.apps.restclienttemplate;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Movie;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
+import org.parceler.Parcels;
 import org.w3c.dom.Text;
 
 import java.text.ParseException;
@@ -69,13 +77,15 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
     }
 
     // Define a viewholder
-    public class Viewholder extends RecyclerView.ViewHolder {
+    public class Viewholder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
         TextView tvTimestamp;
         ImageView ivMedia1;
+        ImageButton btnFavorite;
+        ImageButton btnRetweet;
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
@@ -84,18 +94,56 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
             ivMedia1 = itemView.findViewById(R.id.ivMedia1);
+            btnFavorite = itemView.findViewById(R.id.btnFavorite);
+            btnRetweet = itemView.findViewById(R.id.btnRetweet);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Tweet tweet) {
             tvBody.setText(tweet.body);
             tvScreenName.setText(tweet.user.screenName);
+//            tvTimestamp.setText(tweet.createdAt);
             tvTimestamp.setText(getRelativeTimeAgo(tweet.createdAt));
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
             Glide.with(context).load(tweet.media1ImageUrl).into(ivMedia1);
+            if (tweet.liked) {
+                btnFavorite.setColorFilter(Color.RED);
+            }
+
+            else {
+                btnFavorite.setColorFilter(Color.BLACK);
+            }
+
+            if (tweet.retweeted) {
+                btnRetweet.setColorFilter(Color.GREEN);
+            }
+
+            else {
+                btnRetweet.setColorFilter(Color.BLACK);
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            // ensure the position is valid
+            if (position != RecyclerView.NO_POSITION) {
+                Tweet tweet = tweets.get(position);
+                // Create an Intent to display MovieDetailsActivity
+                Intent intent = new Intent(context, TweetDetailActivity.class);
+                // Pass the movie as an extra serialized
+                intent.putExtra(Tweet.class.getSimpleName(), Parcels.wrap(tweet));
+                // Show the activity
+//                context.startActivity(intent);
+                ((Activity) context).startActivityForResult(intent, 40);
+            }
         }
 
         // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
         public String getRelativeTimeAgo(String rawJsonDate) {
+            if (rawJsonDate  == null) {
+                return "NULL!!!!!";
+            }
             String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
             SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
             sf.setLenient(true);

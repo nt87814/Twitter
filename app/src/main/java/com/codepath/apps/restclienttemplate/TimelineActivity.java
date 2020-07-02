@@ -2,18 +2,24 @@ package com.codepath.apps.restclienttemplate;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetDao;
+import com.codepath.apps.restclienttemplate.models.TweetWithUser;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -37,6 +43,7 @@ public class TimelineActivity extends AppCompatActivity {
     List<Tweet> tweets;
     TweetsAdapter adapter;
     SwipeRefreshLayout swipeContainer;
+    TweetDao tweetDao;
     private EndlessRecyclerViewScrollListener scrollListener;
 
     @Override
@@ -45,6 +52,8 @@ public class TimelineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timeline);
 
         client = TwitterApp.getRestClient(this);
+
+        tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
 
         swipeContainer = findViewById(R.id.swipeContainer);
@@ -72,15 +81,28 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setLayoutManager(layoutManager);
         rvTweets.setAdapter(adapter);
 
-        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+//        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+//                Log.i(TAG, "onLoadMore: " + page);
+//                loadMoreData();
+//            }
+//        };
+//        // Adds the scroll listener to RecyclerView
+//        rvTweets.addOnScrollListener(scrollListener);
+
+        // Query for existing tweets in the DB
+        AsyncTask.execute(new Runnable() {
             @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                Log.i(TAG, "onLoadMore: " + page);
-                loadMoreData();
+            public void run() {
+            Log.i(TAG, "Showing data from database");
+            List<TweetWithUser> tweetWithUsers = tweetDao.recentItems();
+            List<Tweet> tweetsFromDB = TweetWithUser.getTweetList(tweetWithUsers);
+            adapter.clear();
+            adapter.addAll(tweetsFromDB);
+            adapter.notifyDataSetChanged();
             }
-        };
-        // Adds the scroll listener to RecyclerView
-        rvTweets.addOnScrollListener(scrollListener);
+        });
 
         populateHomeTimeline();
     }
@@ -126,6 +148,7 @@ public class TimelineActivity extends AppCompatActivity {
             //Navigate to the compose activity, return true to consume it here
             Intent intent = new Intent(this, ComposeActivity.class);
             startActivityForResult(intent, REQUEST_CODE);
+//            showComposeDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -143,6 +166,27 @@ public class TimelineActivity extends AppCompatActivity {
             adapter.notifyItemInserted(0);
             rvTweets.smoothScrollToPosition(0);
         }
+
+        if (requestCode == 40 && resultCode == RESULT_OK) {
+            // Coming from DetailActivity
+            // Give updatedTweet to the recyclerview
+
+            Tweet updatedTweet = Parcels.unwrap(data.getParcelableExtra("updatedTweet"));
+
+            if (updatedTweet != null) {
+                int position = 0;
+                for (int i = 0; i < tweets.size(); i++) {
+                    if (tweets.get(i).id == updatedTweet.id) {
+                        position = i;
+                    }
+                }
+
+                tweets.remove(position);
+                tweets.add(position, updatedTweet);
+                adapter.notifyItemChanged(position);
+            }
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -153,12 +197,25 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i(TAG, "onSuccess!" + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
+                    final List<Tweet> tweetsFromNetwork = Tweet.fromJsonArray(jsonArray);
                     // CLEAR OUT old items before appending in the new ones
                     adapter.clear();
                     // ...the data has come back, add new items to your adapter...
-                    adapter.addAll(Tweet.fromJsonArray(jsonArray));
+                    adapter.addAll(tweetsFromNetwork);
+                    adapter.notifyDataSetChanged();
                     // Now we call setRefreshing(false) to signal refresh has finished
                     swipeContainer.setRefreshing(false);
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "Saving data into database");
+                            // insert users first because FK connection
+                            List<User> usersFromNetwork = User.fromJsonTweetArray(tweetsFromNetwork);
+                            tweetDao.insertModel(usersFromNetwork.toArray(new User[0]));
+                            // insert tweets next
+                            tweetDao.insertModel(tweetsFromNetwork.toArray(new Tweet[0]));
+                        }
+                    });
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.e(TAG, "Json exception", e);
@@ -171,5 +228,12 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.e(TAG, "onFailure!" + response, throwable);            //throwable is the exception
             }
         });
+    }
+
+    private void showComposeDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        ComposeFragment composeFragment = ComposeFragment.newInstance("Some Title");
+        Log.d(TAG, "show fragment");
+//        composeFragment.show(fm, "fragment_compose");
     }
 }
