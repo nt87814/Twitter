@@ -6,20 +6,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.fragment.app.DialogFragment;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ComposeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ComposeFragment extends Fragment {
+public class ComposeFragment extends DialogFragment implements TextView.OnEditorActionListener {
 
     public static final String TAG = "ComposeActivity";
     public static final int MAX_TWEET_LENGTH = 140;
@@ -30,19 +35,18 @@ public class ComposeFragment extends Fragment {
 
     TwitterClient client;
 
-    public ComposeFragment() {
-        // Required empty public constructor
+    // 1. Defines the listener interface with a method passing back data result.
+    public interface EditNameDialogListener {
+        void onFinishEditDialog(String inputText);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ComposeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
+    public ComposeFragment() {
+        // Required empty public constructor
+        // Empty constructor is required for DialogFragment
+        // Make sure not to add arguments to the constructor
+        // Use `newInstance` instead as shown below
+    }
+
     public static ComposeFragment newInstance(String title) {
         ComposeFragment fragment = new ComposeFragment();
         Bundle args = new Bundle();
@@ -52,18 +56,10 @@ public class ComposeFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //  = getArguments().getString(ARG_PARAM1);
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_compose, container, false);
+        return inflater.inflate(R.layout.fragment_compose, container);
     }
 
     @Override
@@ -71,14 +67,32 @@ public class ComposeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
         etCompose = (EditText) view.findViewById(R.id.etCompose);
-        btnTweet = view.findViewById(R.id.btnTweet);
-        etCharCount = view.findViewById(R.id.etCharCount);
+//        btnTweet = view.findViewById(R.id.btnTweet);
+//        etCharCount = view.findViewById(R.id.etCharCount);
         // Fetch arguments from bundle and set title
         String title = getArguments().getString("title", "Enter Name");
-//        getDialog().setTitle(title);
+        getDialog().setTitle(title);
         // Show soft keyboard automatically and request focus to field
         etCompose.requestFocus();
-//        getDialog().getWindow().setSoftInputMode(
-//                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        getDialog().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        // 2. Setup a callback when the "Done" button is pressed on keyboard
+        etCompose.setOnEditorActionListener(this);
+    }
+
+    // Fires whenever the textfield has an action performed
+    // In this case, when the "Done" button is pressed
+    // REQUIRES a 'soft keyboard' (virtual keyboard)
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (EditorInfo.IME_ACTION_DONE == actionId) {
+            // Return input text back to activity through the implemented listener
+            EditNameDialogListener listener = (EditNameDialogListener) getActivity();
+            listener.onFinishEditDialog(etCompose.getText().toString());
+            // Close the dialog and return back to the parent activity
+            dismiss();
+            return true;
+        }
+        return false;
     }
 }

@@ -32,7 +32,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ComposeFragment.EditNameDialogListener {
 
     // REQUEST_CODE can be any value we like, used to determine the result type later
     private final int REQUEST_CODE = 20;
@@ -81,15 +81,15 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets.setLayoutManager(layoutManager);
         rvTweets.setAdapter(adapter);
 
-//        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                Log.i(TAG, "onLoadMore: " + page);
-//                loadMoreData();
-//            }
-//        };
-//        // Adds the scroll listener to RecyclerView
-//        rvTweets.addOnScrollListener(scrollListener);
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                Log.i(TAG, "onLoadMore: " + page);
+                loadMoreData();
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        rvTweets.addOnScrollListener(scrollListener);
 
         // Query for existing tweets in the DB
         AsyncTask.execute(new Runnable() {
@@ -232,8 +232,13 @@ public class TimelineActivity extends AppCompatActivity {
 
     private void showComposeDialog() {
         FragmentManager fm = getSupportFragmentManager();
-        ComposeFragment composeFragment = ComposeFragment.newInstance("Some Title");
+        ComposeFragment composeFragment = ComposeFragment.newInstance("Compose a Tweet");
         Log.d(TAG, "show fragment");
-//        composeFragment.show(fm, "fragment_compose");
+        composeFragment.show(fm, "fragment_compose");
+    }
+
+    @Override
+    public void onFinishEditDialog(String inputText) {
+        Toast.makeText(this, "Hi, " + inputText, Toast.LENGTH_SHORT).show();
     }
 }

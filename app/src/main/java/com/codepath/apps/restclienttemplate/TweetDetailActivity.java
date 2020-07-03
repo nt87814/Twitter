@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailBinding;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
@@ -39,22 +40,23 @@ public class TweetDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tweet_detail);
+
+        ActivityTweetDetailBinding binding = ActivityTweetDetailBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
 
         client = TwitterApp.getRestClient(this);
 
         tweet = Parcels.unwrap(getIntent().getParcelableExtra(Tweet.class.getSimpleName()));
 
-        ivProfileImage = findViewById(R.id.ivProfileImage);
-        tvScreenName = findViewById(R.id.tvScreenName);
-        tvBody = findViewById(R.id.tvBody);
-        ivMedia1 = findViewById(R.id.ivMedia1);
-        btnFavorite = findViewById(R.id.btnFavorite);
-        btnRetweet = findViewById(R.id.btnRetweet);
+        ivProfileImage = binding.ivProfileImage;
+        ivMedia1 = binding.ivMedia1;
+        btnFavorite = binding.btnFavorite;
+        btnRetweet = binding.btnRetweet;
 
         Glide.with(this).load(tweet.user.profileImageUrl).into(ivProfileImage);
-        tvScreenName.setText(tweet.user.screenName);
-        tvBody.setText(tweet.body);
+        binding.tvScreenName.setText(tweet.user.screenName);
+        binding.tvBody.setText(tweet.body);
         Glide.with(this).load(tweet.media1ImageUrl).into(ivMedia1);
         if (tweet.liked) {
             btnFavorite.setColorFilter(Color.RED);

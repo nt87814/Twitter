@@ -17,7 +17,8 @@
         android:gravity="start|top"
         android:hint="What's happening"
         android:inputType="textMultiLine"
-        android:minLines="5" />
+        android:minLines="5"
+        android:imeOptions="actionDone"/>
 
     <Button
         android:id="@+id/btnTweet"
