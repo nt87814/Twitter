@@ -142,7 +142,7 @@ import okhttp3.Headers;
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.i(TAG, "onFailure! for loadMoreData!", throwable);
-                Toast.makeText(TimelineActivity.this, "onFailure! for loadMoreData!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TimelineActivity.this, "onFailure! for loadMoreData!", Toast.LENGTH_SHORT).show();
             }
         }, tweets.get(tweets.size() - 1).id);
     }
@@ -170,6 +170,7 @@ import okhttp3.Headers;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // compose a tweet
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             // Get data from the intent (tweet)
             Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
@@ -178,19 +179,20 @@ import okhttp3.Headers;
             tweets.add(0, tweet);
             // Update the adapter
             adapter.notifyItemInserted(0);
-            rvTweets.smoothScrollToPosition(0);
         }
 
+        //retweet, like, unlike
         if (requestCode == 40 && resultCode == RESULT_OK) {
             // Coming from DetailActivity
             // Give updatedTweet to the recyclerview
 
             Tweet updatedTweet = Parcels.unwrap(data.getParcelableExtra("updatedTweet"));
+            Tweet originalTweet = Parcels.unwrap(data.getParcelableExtra("originalTweet"));
 
             if (updatedTweet != null) {
                 int position = 0;
                 for (int i = 0; i < tweets.size(); i++) {
-                    if (tweets.get(i).id == updatedTweet.id) {
+                    if (tweets.get(i).id == originalTweet.id) {
                         position = i;
                     }
                 }
@@ -200,7 +202,7 @@ import okhttp3.Headers;
                 adapter.notifyItemChanged(position);
             }
         }
-
+        rvTweets.smoothScrollToPosition(0);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -239,7 +241,7 @@ import okhttp3.Headers;
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG, "onFailure!" + response, throwable);            //throwable is the exception
-                Toast.makeText(TimelineActivity.this, "onFailure! for populateHomeTimeline", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(TimelineActivity.this, "onFailure! for populateHomeTimeline", Toast.LENGTH_SHORT).show();
 
             }
         });

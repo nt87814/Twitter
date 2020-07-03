@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -91,27 +92,29 @@ public class TweetDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Log.e(TAG, "onFailure!" + response, throwable);            //throwable is the exception
                             Toast.makeText(TweetDetailActivity.this, "onFailure for like", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
-
-                client.unlike(tweet.id, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Headers headers, JSON json) {
-                        btnFavorite.setColorFilter(Color.BLACK);
-                        try {
-                            updatedTweet = Tweet.fromJson(json.jsonObject);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                else {
+                    client.unlike(tweet.id, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Headers headers, JSON json) {
+                            btnFavorite.setColorFilter(Color.BLACK);
+                            try {
+                                updatedTweet = Tweet.fromJson(json.jsonObject);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Toast.makeText(TweetDetailActivity.this, "onFailure for unlike", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
+                            Toast.makeText(TweetDetailActivity.this, "onFailure for unlike", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
 
@@ -146,6 +149,7 @@ public class TweetDetailActivity extends AppCompatActivity {
         // transmitting tweet object back to TimeLineActivity.java
         Intent i = new Intent();
         i.putExtra("updatedTweet", Parcels.wrap(updatedTweet));
+        i.putExtra("originalTweet", Parcels.wrap(tweet));
         setResult(RESULT_OK, i);
         finish();
     }
