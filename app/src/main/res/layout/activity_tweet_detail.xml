@@ -36,7 +36,9 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="0dp"
-        tools:text="This is my tweet!!!" />
+        tools:text="This is my tweet!!!"
+        android:autoLink="all"
+        android:linksClickable="true"/>
 
     <ImageView
         android:id="@+id/ivMedia1"

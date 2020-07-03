@@ -1,5 +1,6 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -14,6 +15,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -37,6 +39,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
     // REQUEST_CODE can be any value we like, used to determine the result type later
     private final int REQUEST_CODE = 20;
     public static final String TAG = "TimelineActivity";
+
+    MenuItem miActionProgressItem;
 
     TwitterClient client;
     RecyclerView rvTweets;
@@ -109,6 +113,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
 
     // Append the next page of data into the adapter
     private void loadMoreData() {
+
         // Send an API request to retrieve appropriate paginated data
         client.getNextPageOfTweets(new JsonHttpResponseHandler() {
             @Override
@@ -220,7 +225,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
                     e.printStackTrace();
                     Log.e(TAG, "Json exception", e);
                 }
-
             }
 
             @Override
@@ -228,6 +232,16 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
                 Log.e(TAG, "onFailure!" + response, throwable);            //throwable is the exception
             }
         });
+    }
+
+    public void showProgressBar() {
+        // Show progress item
+        miActionProgressItem.setVisible(true);
+    }
+
+    public void hideProgressBar() {
+        // Hide progress item
+        miActionProgressItem.setVisible(false);
     }
 
     private void showComposeDialog() {
