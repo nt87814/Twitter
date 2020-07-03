@@ -31,8 +31,8 @@ import java.util.Locale;
 
 public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder>{
 
-    Context context;
-    List<Tweet> tweets;
+    private Context context;
+    private List<Tweet> tweets;
 
     // Pass in the context and list of tweets
     public TweetsAdapter(Context context, List<Tweet> tweets) {
@@ -48,7 +48,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
         return new Viewholder(view);
     }
 
-    // Bind values based on the position of the element
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         // Get the data at position
@@ -63,20 +62,17 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
         return tweets.size();
     }
 
-    // Clean all elements of the recycler
     public void clear() {
         // Modifying the exisitng referance to tweets rather than making a new one
         tweets.clear();
         notifyDataSetChanged();
     }
 
-    // Add a list of items -- change to type used
     public void addAll(List<Tweet> tweetList) {
         tweets.addAll(tweetList);
         notifyDataSetChanged();
     }
 
-    // Define a viewholder
     public class Viewholder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView ivProfileImage;
@@ -139,8 +135,11 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.Viewholder
             }
         }
 
-        // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
-        public String getRelativeTimeAgo(String rawJsonDate) {
+        /**
+         * Method that converts a JsonDate to a relative timestamp for each tweet "8m", "7h"
+         * getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");
+         */
+        private String getRelativeTimeAgo(String rawJsonDate) {
             if (rawJsonDate  == null) {
                 return "NULL!!!!!";
             }

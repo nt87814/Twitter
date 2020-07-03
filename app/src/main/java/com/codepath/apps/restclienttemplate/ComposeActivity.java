@@ -21,10 +21,16 @@ import org.parceler.Parcels;
 
 import okhttp3.Headers;
 
+/**
+ * Activity for composing a tweet
+ *
+ * This activity is used to compose a tweet and display in the the TimelineActivity
+ *
+ * */
 public class ComposeActivity extends AppCompatActivity {
 
-    public static final String TAG = "ComposeActivity";
-    public static final int MAX_TWEET_LENGTH = 140;
+    private static final String TAG = "ComposeActivity";
+    private static final int MAX_TWEET_LENGTH = 140;
 
     EditText etCompose;
     Button btnTweet;
@@ -63,7 +69,6 @@ public class ComposeActivity extends AppCompatActivity {
 
         etCompose.addTextChangedListener(mTextEditorWatcher);
 
-        // Set click listener on button
         btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +102,8 @@ public class ComposeActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-                        Log.e(TAG, "onFailure to pubish tweet",  throwable);
+                        Log.e(TAG, "onFailure for publish tweet",  throwable);
+                        Toast.makeText(ComposeActivity.this, "onFailure for publish tweet", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

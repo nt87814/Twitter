@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.databinding.ActivityTweetDetailBinding;
@@ -23,6 +24,13 @@ import org.w3c.dom.Text;
 
 import okhttp3.Headers;
 
+/**
+ * Activity for displaying tweet details
+ *
+ * This activity is used to display the tweet with more details and allows
+ * the user to like, unlike, favorite the tweet, and click on the link in the body.
+ *
+ * */
 public class TweetDetailActivity extends AppCompatActivity {
 
     Tweet tweet;
@@ -36,7 +44,7 @@ public class TweetDetailActivity extends AppCompatActivity {
 
     TwitterClient client;
 
-    public static final String TAG = "TweetDetailsActivity";
+    private static final String TAG = "TweetDetailsActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +91,7 @@ public class TweetDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-
+                            Toast.makeText(TweetDetailActivity.this, "onFailure for like", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -101,7 +109,7 @@ public class TweetDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-
+                        Toast.makeText(TweetDetailActivity.this, "onFailure for unlike", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -124,7 +132,7 @@ public class TweetDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
-
+                            Toast.makeText(TweetDetailActivity.this, "onFailure for retweet", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -135,8 +143,6 @@ public class TweetDetailActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
-
         // transmitting tweet object back to TimeLineActivity.java
         Intent i = new Intent();
         i.putExtra("updatedTweet", Parcels.wrap(updatedTweet));

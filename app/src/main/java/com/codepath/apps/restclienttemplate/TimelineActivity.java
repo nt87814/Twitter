@@ -34,11 +34,17 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-public class TimelineActivity extends AppCompatActivity implements ComposeFragment.EditNameDialogListener {
+/**
+ * Activity for displaying timeline tweets
+ *
+ * This activity is used to display the timeline tweets of the user.
+ *
+ * */
+ public class TimelineActivity extends AppCompatActivity implements ComposeFragment.EditNameDialogListener {
 
     // REQUEST_CODE can be any value we like, used to determine the result type later
     private final int REQUEST_CODE = 20;
-    public static final String TAG = "TimelineActivity";
+    private static final String TAG = "TimelineActivity";
 
     MenuItem miActionProgressItem;
 
@@ -111,7 +117,9 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
         populateHomeTimeline();
     }
 
-    // Append the next page of data into the adapter
+    /**
+     * Method that appends the next page of data into the adapter
+     */
     private void loadMoreData() {
 
         // Send an API request to retrieve appropriate paginated data
@@ -134,6 +142,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.i(TAG, "onFailure! for loadMoreData!", throwable);
+                Toast.makeText(TimelineActivity.this, "onFailure! for loadMoreData!", Toast.LENGTH_SHORT).show();
             }
         }, tweets.get(tweets.size() - 1).id);
     }
@@ -230,16 +239,18 @@ public class TimelineActivity extends AppCompatActivity implements ComposeFragme
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable) {
                 Log.e(TAG, "onFailure!" + response, throwable);            //throwable is the exception
+                Toast.makeText(TimelineActivity.this, "onFailure! for populateHomeTimeline", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
 
-    public void showProgressBar() {
+    private void showProgressBar() {
         // Show progress item
         miActionProgressItem.setVisible(true);
     }
 
-    public void hideProgressBar() {
+    private void hideProgressBar() {
         // Hide progress item
         miActionProgressItem.setVisible(false);
     }

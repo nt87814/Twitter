@@ -43,8 +43,7 @@ public class TwitterClient extends OAuthBaseClient {
 				String.format(REST_CALLBACK_URL_TEMPLATE, context.getString(R.string.intent_host),
 						context.getString(R.string.intent_scheme), context.getPackageName(), FALLBACK_URL));
 	}
-	// CHANGE THIS
-	// DEFINE METHODS for different API endpoints here
+
 	public void getHomeTimeline(JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
@@ -56,6 +55,9 @@ public class TwitterClient extends OAuthBaseClient {
 		client.get(apiUrl, params, handler);
 	}
 
+	/**
+	 * Method that gets the next page of tweets for endless scrolling
+	 */
 	public void getNextPageOfTweets(JsonHttpResponseHandler handler, long maxId) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
@@ -66,41 +68,36 @@ public class TwitterClient extends OAuthBaseClient {
 
 	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/update.json");
-		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("status", tweetContent);
 
-		// Will return result tweets greater than specified since_ied
 		client.post(apiUrl, params, "", handler);
 	}
 
+	/**
+	 * Method that favorites a tweet with id
+	 */
 	public void like(long id, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("favorites/create.json");
-		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("id", id);
 
-		// Will return result tweets greater than specified since_ied
 		client.post(apiUrl, params, "", handler);
 	}
 
 	public void unlike(long id, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("favorites/destroy.json");
-		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("id", id);
 
-		// Will return result tweets greater than specified since_ied
 		client.post(apiUrl, params, "", handler);
 	}
 
 	public void retweet(long id, JsonHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/retweet.json");
-		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("id", id);
 
-		// Will return result tweets greater than specified since_ied
 		client.post(apiUrl, params, "", handler);
 	}
 
